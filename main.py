@@ -21,3 +21,32 @@ for filename, url in DATASOURCE.items():
         response = requests.get(url)
         with open(f"{filename}.txt", "wb") as f:
             f.write(response.content)
+            
+# We now have pre-cleaned text thanks to Gutenberg. Now we need to extract the book contents and store them as a list of strings in python
+
+# Read and preprocess the text
+def preprocess_gutenberg(filename):
+    with open(filename, "r", encoding="utf-8") as f:
+        text = f.read()
+        
+        # Need to find the start and end of the text
+        start = text.find("*** START OF THE PROJECT GUTENBERG EBOOK")
+        start = text.find("\n", start) + 1
+        end = text.find("*** END OF THE PROJECT GUTENBERG EBOOK")
+        
+        # Extracting the main content
+        text = text[start:end].strip()
+        
+        # Basic preprocessing
+        # Remove multiple newlines and spaces
+        text = "\n".join(line.strip() for line in text.split("\n") if line.strip())
+        return text
+    
+def get_dataset_text():
+    all_text = []
+    for filename in DATASOURCE:
+        text = preprocess_gutenberg(f"{filename}.txt")
+        all_text.append(text)
+    return all_text
+
+text = get_dataset_text()
